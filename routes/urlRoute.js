@@ -1,5 +1,5 @@
 const express=require("express");
-const { shorten, fetch, redirect, details, rank } = require("../controllers/urlcontroller");
+const { shorten, fetch, redirect, details, rank } = require("../controllers/urlController");
 
 const urlRouter=express.Router();
 

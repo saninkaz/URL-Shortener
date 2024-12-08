@@ -33,7 +33,6 @@ const shorten = async (req, res) => {
     }
 }
 
-
 // Fetch all URLS 
 
 const fetch = async (req, res) => {
