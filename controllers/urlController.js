@@ -21,7 +21,7 @@ const shorten = async (req, res) => {
                 return res.json({ success: true, message: "URL Shortened successfully" })
             }
             else {
-                 return res.json({ success: false, message: "Enter valid URL" })
+                return res.json({ success: false, message: "Enter valid URL" })
             }
         }
         else {
@@ -55,7 +55,7 @@ const redirect = async (req, res) => {
         const Url = await urlModel.findOne({ shortUrl: `http://localhost:${process.env.PORT}/${sUrl}` })
         if (Url) {
             const currentDate = Url.lastClicked.getDate();
-            Url.lastClicked = new Date(); 
+            Url.lastClicked = new Date();
             if (Url.lastClicked.getDate() === currentDate && Url.hitCount >= 20) {
                 return res.json({ success: false, message: "More than 20 requests made for this day , Further requests will not be accepted" })
             }
@@ -80,4 +80,53 @@ const redirect = async (req, res) => {
     }
 }
 
-module.exports = { shorten, fetch, redirect };
+// Get Details
+
+const details = async (req, res) => {
+    try {
+
+        const url = req.params.url;
+        const sUrl = `http://localhost:${process.env.PORT}/${url}`;
+        const lUrl = `https://${url}`;
+        const check = await urlModel.findOne({
+            $or: [{ shortUrl: sUrl },
+            { longUrl: lUrl }]
+        })
+        if (check.shortUrl === sUrl) {
+            res.json({ success: true, hitCount: check.hitCount, message: "The given URL is a short URL" })
+        }
+        else if (check.longUrl === lUrl) {
+            res.json({ success: true, hitCount: check.hitCount, message: "The given URL is a long URL", shortUrl: check.shortUrl })
+        }
+
+
+    } catch (error) {
+        console.log(error)
+        res.json({ success: false, message: "Error Occurred" })
+    }
+}
+
+// Rank of Urls based on Hit Count
+
+const rank = async (req, res) => {
+    try {
+        let rank = [];
+        const num = req.params.number;
+        if (num <= 0) {
+            return res.json({ success: false, message: "Invalid Number" })
+        }
+        let urls = await urlModel.find({});
+        urls.sort((a, b) => (b.hitCount) - (a.hitCount));
+        console.log(urls);
+        for (let i = 0; i < num; i++) {
+            rank[i] = urls[i];
+        }
+        res.json({ success: true, rank, message: "Rank Fetched Successfully" })
+
+    } catch (error) {
+        console.log(error)
+        res.json({ success: false, message: "Error Occurred" })
+    }
+}
+
+module.exports = { shorten, fetch, redirect, details, rank };
