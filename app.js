@@ -18,6 +18,11 @@ const PORT=process.env.PORT
 app.use(express.json()); 
 app.use(cors());
 app.use('/api/url',urlRouter);
+app.use(express.static('htmlRoutes/Home-Page'));
+
+app.get('/',(req,res)=>{
+        res.sendFile(__dirname + '/htmlRoutes/Home-Page/index.html');
+})
   
 
 connectdb();

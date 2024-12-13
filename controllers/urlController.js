@@ -18,14 +18,14 @@ const shorten = async (req, res) => {
                 req.body.shortUrl = shortUrl;
                 const url = await urlModel.create(req.body)
 
-                return res.json({ success: true, message: "URL Shortened successfully" })
+                return res.json({ success: true, message: "URL Shortened successfully", shortenedUrl: url.shortUrl  })
             }
             else {
-                return res.json({ success: false, message: "Enter valid URL" })
+                return res.json({ success: false, message: "Enter a valid URL" })
             }
         }
         else {
-            res.json({ success: false, message: "URL already shortened", shortenedUrl: Url.shortUrl })
+            res.status(409).json({ success: false, message: "URL already shortened", shortenedUrl: Url.shortUrl })
         }
     } catch (error) {
         console.log(error)
@@ -51,6 +51,7 @@ const fetch = async (req, res) => {
 const redirect = async (req, res) => {
     try {
         const sUrl = req.params.shortUrl
+        console.log(sUrl);
         const Url = await urlModel.findOne({ shortUrl: `http://localhost:${process.env.PORT}/${sUrl}` })
         if (Url) {
             const currentDate = Url.lastClicked.getDate();
@@ -105,7 +106,7 @@ const details = async (req, res) => {
     }
 }
 
-// Rank of Urls based on Hit Count
+// Rank of Urls Based on Hit Count
 
 const rank = async (req, res) => {
     try {
@@ -118,7 +119,10 @@ const rank = async (req, res) => {
         urls.sort((a, b) => (b.hitCount) - (a.hitCount));
         console.log(urls);
         for (let i = 0; i < num; i++) {
-            rank[i] = urls[i];
+            rank[i] = urls[i].toObject();
+            delete rank[i]._id;
+            delete rank[i].__v;
+            rank[i].rank = i + 1;
         }
         res.json({ success: true, rank, message: "Rank Fetched Successfully" })
 

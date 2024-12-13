@@ -1,0 +1,56 @@
+h1{
+    text-align: center;
+    color: white;
+    margin-top: 70px;
+    margin-bottom: 90px;
+    font-size: 3rem;
+}
+
+body{
+    background-color: black;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif
+}
+
+.buttons{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    margin-top: -10px;
+}
+
+.first-button{
+    display: flex;
+    gap: 40px;
+    margin-right: 409px;
+}
+
+.redirect-button{
+    display: flex;
+    gap: 80px;
+    margin-right: 325px;
+}
+
+.first-button p,.redirect-button p{
+    font-size: 1.4rem;
+}
+
+.buttons #shorten,.buttons #fetch, .buttons #redirect,.buttons #rank,.buttons #details{
+    font-size: 3rem;
+    width: 350px;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    padding: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+
+.buttons #fetch:hover, .buttons #shorten:hover, .buttons #redirect:hover,.buttons #rank:hover,.buttons #details:hover{
+    background-color: rgba(255, 255, 255, 0.377);
+}
+
+.buttons #fetch:hover, .buttons #shorten:hover, .buttons #redirect:active,.buttons #rank:active,.buttons #details:active{
+    background-color: rgba(255, 255, 255, 0.663);
+}
+
+
