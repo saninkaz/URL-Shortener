@@ -14,13 +14,11 @@ document.getElementById('shorten').addEventListener('click', async () => {
 
             const result = await response.json();
             if (response.ok) {
-                alert(`Shortened URL: ${result.shortenedUrl}`)
-            } else {
                 if (result.shortenedUrl) {
                     alert(`message: ${result.message} \nshortenedUrl: ${result.shortenedUrl} `)
                 }
                 else {
-                    alert(`Error:${result.message} `)
+                    alert(`Error: ${result.message} `)
                 }
             }
         } catch (error) {

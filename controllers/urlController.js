@@ -10,22 +10,28 @@ const shorten = async (req, res) => {
         const { longUrl } = req.body;
         const Url = await urlModel.findOne({ longUrl });
         if (!Url) {
-            if (longUrl.includes("https://") || longUrl.includes("http://")) {
-                const count = await urlModel.countDocuments({});
-                let shortUrl = "http://localhost:4000/url";
-                let str = `${count + 1}`;
-                shortUrl = shortUrl + str.padStart(3, '0');
-                req.body.shortUrl = shortUrl;
-                const url = await urlModel.create(req.body)
+            if (longUrl) {
+                if ((longUrl.includes("https://") || longUrl.includes("http://")) && longUrl.includes(".com")) {
+                    console.log(longUrl)
+                    const count = await urlModel.countDocuments({});
+                    let shortUrl = "http://localhost:4000/url";
+                    let str = `${count + 1}`;
+                    shortUrl = shortUrl + str.padStart(3, '0');
+                    req.body.shortUrl = shortUrl;
+                    const url = await urlModel.create(req.body)
 
-                return res.json({ success: true, message: "URL Shortened successfully", shortenedUrl: url.shortUrl  })
+                    return res.json({ success: true, message: "URL Shortened successfully", shortenedUrl: url.shortUrl })
+                }
+                else {
+                    return res.json({ success: false, message: "Enter a valid URL" })
+                }
             }
-            else {
-                return res.json({ success: false, message: "Enter a valid URL" })
+            else{
+                return res.json({ success: false, message: "Missing longUrl field" })
             }
         }
         else {
-            res.status(409).json({ success: false, message: "URL already shortened", shortenedUrl: Url.shortUrl })
+            res.json({ success: false, message: "URL already shortened", shortenedUrl: Url.shortUrl })
         }
     } catch (error) {
         console.log(error)
@@ -92,11 +98,18 @@ const details = async (req, res) => {
             $or: [{ shortUrl: sUrl },
             { longUrl: lUrl }]
         })
-        if (check.shortUrl === sUrl) {
-            res.json({ success: true, hitCount: check.hitCount, message: "The given URL is a short URL" })
+
+        if (check) {
+            if (check.shortUrl === sUrl) {
+                res.json({ success: true, hitCount: check.hitCount, message: "The given URL is a short URL" })
+            }
+            else if (check.longUrl === lUrl) {
+                res.json({ success: true, hitCount: check.hitCount, message: "The given URL is a long URL", shortUrl: check.shortUrl })
+            }
         }
-        else if (check.longUrl === lUrl) {
-            res.json({ success: true, hitCount: check.hitCount, message: "The given URL is a long URL", shortUrl: check.shortUrl })
+
+        else {
+            res.status(404).json({ success: false, message: "URL Not Found" })
         }
 
 
@@ -112,19 +125,24 @@ const rank = async (req, res) => {
     try {
         let rank = [];
         const num = req.params.number;
-        if (num <= 0) {
-            return res.json({ success: false, message: "Invalid Number" })
+        if (typeof num === 'number') {
+            if (num <= 0) {
+                return res.json({ success: false, message: "Invalid Number" })
+            }
+            let urls = await urlModel.find({});
+            urls.sort((a, b) => (b.hitCount) - (a.hitCount));
+            console.log(urls);
+            for (let i = 0; i < num; i++) {
+                rank[i] = urls[i].toObject();
+                delete rank[i]._id;
+                delete rank[i].__v;
+                rank[i].rank = i + 1;
+            }
+            res.json({ success: true, rank, message: "Rank Fetched Successfully" })
         }
-        let urls = await urlModel.find({});
-        urls.sort((a, b) => (b.hitCount) - (a.hitCount));
-        console.log(urls);
-        for (let i = 0; i < num; i++) {
-            rank[i] = urls[i].toObject();
-            delete rank[i]._id;
-            delete rank[i].__v;
-            rank[i].rank = i + 1;
+        else {
+            res.json({ success: false, message: "Invalid Input" })
         }
-        res.json({ success: true, rank, message: "Rank Fetched Successfully" })
 
     } catch (error) {
         console.log(error)
