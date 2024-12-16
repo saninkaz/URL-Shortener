@@ -124,14 +124,14 @@ const details = async (req, res) => {
 const rank = async (req, res) => {
     try {
         let rank = [];
-        const num = req.params.number;
-        if (typeof num === 'number') {
+        const num = Number(req.params.number);
+        console.log(num)
+        if (!isNaN(num)) {
             if (num <= 0) {
                 return res.json({ success: false, message: "Invalid Number" })
             }
             let urls = await urlModel.find({});
             urls.sort((a, b) => (b.hitCount) - (a.hitCount));
-            console.log(urls);
             for (let i = 0; i < num; i++) {
                 rank[i] = urls[i].toObject();
                 delete rank[i]._id;
